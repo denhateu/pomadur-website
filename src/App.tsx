@@ -1,12 +1,18 @@
+"use client";
+
 import React from 'react';
-import { Container, Box, Text, Button } from '@chakra-ui/react';
+import { Container, Box, Text, Button, Flex } from '@chakra-ui/react';
+import { ColorModeButton } from './components/ui/color-mode';
 
 const App: React.FC = () => {
   return (
     <Box>
       <Box py={4}>
         <Container>
-          <Text textStyle="2xl" fontWeight="bold">Pomadur</Text>
+          <Flex align="center" justify="space-between">
+            <Text textStyle="2xl" fontWeight="bold">Pomadur</Text>
+            <ColorModeButton />
+          </Flex>
         </Container>
       </Box>
       <Box>
