@@ -5,98 +5,90 @@ import { Container, Box, Text, Button, Flex, Stack } from "@chakra-ui/react"
 import { ColorModeButton } from "./components/ui/color-mode"
 
 const App: React.FC = () => {
-  const [isRunning, setIsRunning] = useState(false)
-  const [isPause, setIsPause] = useState(false)
+  const [isPomodoroRunning, setIsPomodoroRunning] = useState(false)
+  const [isPomodoroPause, setIsPomodoroPause] = useState(false)
 
-  let timerTextRef = useRef<HTMLDivElement>(null)
-  let pomodoroIntervalId = useRef<number | null>(null)
-  let totalPomodoroSeconds = useRef<number | null>(null)
+  const timerTimeRef = useRef(null)
+  const pomodoroIntervalId = useRef<number | null>(null)
+  const pomodoroMinutes = useRef<number | null>(0)
 
-  let minutesText: string = ""
-  if (timerTextRef.current) {
-    minutesText = timerTextRef.current.innerHTML
+  let totalPomodoroSeconds = useRef<number | undefined>(0)
+
+  if (pomodoroMinutes.current == 0) {
+    if (timerTimeRef.current) {
+      pomodoroMinutes.current = timerTimeRef.current.innerHTML
+    }
   }
 
-  const updateSeconds = (seconds: number = 0) => {
-    let minutesLeft = Math.floor(seconds / 60)
-    let secondsLeft = seconds % 60
+  const getTimerSeconds = () => {
+    if (timerTimeRef.current) {
+      // Gets minutes from element on page, for example, "25:00"
+      const timerMinutes = timerTimeRef.current.innerHTML
 
-    if (secondsLeft < 10) {
-      secondsLeft = "0" + secondsLeft
+      // Gets only minutes from timer string, example "25:00" -> "25"
+      let pomodoroMinutes = timerMinutes.split(":")[0]
+
+      // Minutes to seconds
+      return Number.parseInt(pomodoroMinutes) * 60
+    }
+  }
+
+  const updateTimer = (totalSeconds: number = 0) => {
+    let minutes = Math.floor(totalSeconds / 60)
+    let seconds = totalSeconds % 60
+
+    if (seconds < 10) {
+      seconds = "0" + seconds
     }
 
-    if (timerTextRef.current) {
-      timerTextRef.current.innerHTML = minutesLeft + ":" + secondsLeft
+    if (timerTimeRef.current) {
+      timerTimeRef.current.innerHTML = minutes + ":" + seconds
     }
 
     // Checks if timer time is 0 minutes and 0 seconds and stop pomodoro timer interval
-    if (minutesLeft === 0 && secondsLeft === 0) {
-      stopPomodoroTimer()
+    if (minutes === 0 && seconds === 0) {
+      pomodoro("stop")
     }
   }
 
-  const startPomodoroTimer = () => {
-    if (timerTextRef.current) {
-      // Gets minutes from element on page, for example, "25:00"
-      const elementText = timerTextRef.current.innerHTML
-
-      // Gets only minutes from timer string, example "25:00" -> "25"
-      let pomodoroMinutes = elementText.split(":")[0]
-
-      // Minutes to seconds
-      totalPomodoroSeconds.current = Number.parseInt(pomodoroMinutes) * 60
-
-      // If interval started, do nothing
-      if (pomodoroIntervalId.current) return;
-
-      // Starting pomodoro timer interval
-      pomodoroIntervalId.current = setInterval(() => {
-        totalPomodoroSeconds.current--
-        updateSeconds(totalPomodoroSeconds.current)
-      }, 1000)
-
-      setIsRunning(true)
-      setIsPause(false)
-    }
-  }
-
-  const stopPomodoroTimer = () => {
-    if (pomodoroIntervalId.current) {
-      // Reset timer
-      totalPomodoroSeconds.current = Number.parseInt(minutesText) * 60;
-      updateSeconds(totalPomodoroSeconds.current)
-
-      clearInterval(pomodoroIntervalId.current)
-      pomodoroIntervalId.current = null
-
-      setIsRunning(false)
-    } else {
-      // Reset timer
-      totalPomodoroSeconds.current = Number.parseInt(minutesText) * 60;
-      updateSeconds(totalPomodoroSeconds.current)
-    }
-  }
-
-  const pausePomodoroTimer = () => {
-    if (pomodoroIntervalId.current) {
-      clearInterval(pomodoroIntervalId.current)
-      pomodoroIntervalId.current = null
-
-      setIsPause(true)
-    }
-  }
-
-  const resumePomodoroTimer = () => {
-    console.log(totalPomodoroSeconds.current)
-    console.log("resume")
-
+  const startTimer = () => {
+    // Starting pomodoro timer interval
     pomodoroIntervalId.current = setInterval(() => {
       totalPomodoroSeconds.current--
-      updateSeconds(totalPomodoroSeconds.current)
+      updateTimer(totalPomodoroSeconds.current)
     }, 1000)
+  }
 
-    setIsRunning(true)
-    setIsPause(false)
+  const stopTimer = () => {
+    if (pomodoroIntervalId.current) {
+      // Stopping pomodoro timer interval
+      clearInterval(pomodoroIntervalId.current)
+    }
+  }
+
+  const resetTimer = () => {
+    if (timerTimeRef.current) {
+      // totalPomodoroSeconds.current = pomodoroMinutes.current
+      timerTimeRef.current.innerHTML = pomodoroMinutes.current
+    }
+  }
+
+  const pomodoro = (action: string = "") => {
+    if (action == "start") {
+      totalPomodoroSeconds.current = getTimerSeconds()
+      startTimer()
+      setIsPomodoroRunning(true)
+    } else if (action == "stop") {
+      stopTimer()
+      resetTimer()
+      setIsPomodoroRunning(false)
+    } else if (action == "pause") {
+      stopTimer()
+      setIsPomodoroPause(true)
+    } else if (action == "resume") {
+      startTimer()
+      setIsPomodoroPause(false)
+    }
   }
 
   return (
@@ -115,7 +107,7 @@ const App: React.FC = () => {
         <Container>
           <Box>
             <Text
-              ref={timerTextRef}
+              ref={timerTimeRef}
               mb={2}
               textAlign="center"
               textStyle="6xl"
@@ -123,23 +115,23 @@ const App: React.FC = () => {
             >
               25:00
             </Text>
-            {isRunning ? (
+            {isPomodoroRunning ? (
               <Stack>
-                {isPause ? (
-                  <Button w="full" onClick={resumePomodoroTimer}>
+                {isPomodoroPause ? (
+                  <Button w="full" onClick={() => pomodoro("resume")}>
                     Продолжить
                   </Button>
                 ) : (
-                  <Button w="full" onClick={pausePomodoroTimer}>
+                  <Button w="full" onClick={() => pomodoro("pause")}>
                     Пауза
                   </Button>
                 )}
-                <Button w="full" onClick={stopPomodoroTimer}>
+                <Button w="full" onClick={() => pomodoro("stop")}>
                   Стоп
                 </Button>
               </Stack>
             ) : (
-              <Button w="full" onClick={startPomodoroTimer}>
+              <Button w="full" onClick={() => pomodoro("start")}>
                 Начать
               </Button>
             )}
