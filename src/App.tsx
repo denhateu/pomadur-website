@@ -15,7 +15,7 @@ const App: React.FC = () => {
           </Flex>
         </Container>
       </Box>
-      <Box>
+      <Box pt="80px">
         <Container>
           <Box>
             <Text mb={2} textAlign="center" textStyle="6xl" fontWeight="bold">25:00</Text>
