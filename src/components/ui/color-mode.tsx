@@ -32,7 +32,7 @@ export function useColorMode(): UseColorModeReturn {
   return {
     colorMode: colorMode as ColorMode,
     setColorMode: setTheme,
-    toggleColorMode,
+    toggleColorMode
   }
 }
 
@@ -65,8 +65,8 @@ export const ColorModeButton = React.forwardRef<
         css={{
           _icon: {
             width: "5",
-            height: "5",
-          },
+            height: "5"
+          }
         }}
       >
         <ColorModeIcon />
@@ -88,7 +88,7 @@ export const LightMode = React.forwardRef<HTMLSpanElement, SpanProps>(
         {...props}
       />
     )
-  },
+  }
 )
 
 export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
@@ -104,5 +104,5 @@ export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
         {...props}
       />
     )
-  },
+  }
 )
