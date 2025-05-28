@@ -1,8 +1,18 @@
 "use client"
 
 import React, { useRef, useState } from "react"
-import { Container, Box, Text, Button, Flex, Stack } from "@chakra-ui/react"
-import { ColorModeButton } from "./components/ui/color-mode"
+import {
+  Container,
+  Box,
+  AbsoluteCenter,
+  Text,
+  Button,
+  IconButton,
+  Flex
+} from "@chakra-ui/react"
+import { FaPause } from "react-icons/fa"
+import { RxReset } from "react-icons/rx"
+import { VscDebugContinue } from "react-icons/vsc"
 
 const App: React.FC = () => {
   const [isPomodoroRunning, setIsPomodoroRunning] = useState(false)
@@ -92,49 +102,72 @@ const App: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Box py={4}>
+    <Box
+      bgImage="url('./assets/img/wallpaper.jpg')"
+      bgSize="cover"
+      height="100vh"
+      position="relative"
+    >
+      <Box>
         <Container>
-          <Flex align="center" justify="space-between">
-            <Text textStyle="2xl" fontWeight="bold">
-              Pomadur
-            </Text>
-            <ColorModeButton />
-          </Flex>
-        </Container>
-      </Box>
-      <Box pt="80px">
-        <Container>
-          <Box>
-            <Text
-              ref={timerTimeRef}
-              mb={2}
-              textAlign="center"
-              textStyle="6xl"
-              fontWeight="bold"
-            >
-              25:00
-            </Text>
-            {isPomodoroRunning ? (
-              <Stack>
-                {isPomodoroPause ? (
-                  <Button w="full" onClick={() => pomodoro("resume")}>
-                    Продолжить
-                  </Button>
-                ) : (
-                  <Button w="full" onClick={() => pomodoro("pause")}>
-                    Пауза
-                  </Button>
-                )}
-                <Button w="full" onClick={() => pomodoro("stop")}>
-                  Стоп
-                </Button>
-              </Stack>
-            ) : (
-              <Button w="full" onClick={() => pomodoro("start")}>
-                Начать
-              </Button>
-            )}
+          <Box position="relative" h="100vh">
+            <AbsoluteCenter w="full" maxW="300px" axis="both">
+              <Box
+                w="full"
+                px={4}
+                py={6}
+                bg="rgba(255, 255, 255, 0.2)"
+                backdropFilter="blur(10px)"
+                boxShadow="lg"
+                borderWidth="1px"
+                borderRadius="standartRadius"
+              >
+                <Box mb={2}>
+                  <Text
+                    ref={timerTimeRef}
+                    textAlign="center"
+                    textStyle="4xl"
+                    fontWeight="bold"
+                  >
+                    25:00
+                  </Text>
+                </Box>
+                <Box>
+                  {isPomodoroRunning ? (
+                    <Flex justify="space-between">
+                      <IconButton
+                        aria-label="Сбросить"
+                        variant="ghost"
+                        onClick={() => pomodoro("stop")}
+                      >
+                        <RxReset />
+                      </IconButton>
+                      {isPomodoroPause ? (
+                        <IconButton
+                          aria-label="Продолжить"
+                          variant="ghost"
+                          onClick={() => pomodoro("resume")}
+                        >
+                          <VscDebugContinue />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          aria-label="Поставить на паузу"
+                          variant="ghost"
+                          onClick={() => pomodoro("pause")}
+                        >
+                          <FaPause />
+                        </IconButton>
+                      )}
+                    </Flex>
+                  ) : (
+                    <Button w="full" onClick={() => pomodoro("start")}>
+                      Начать
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </AbsoluteCenter>
           </Box>
         </Container>
       </Box>
